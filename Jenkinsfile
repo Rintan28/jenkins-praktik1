@@ -1,0 +1,56 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Install Depencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+        stage('Run Test') {
+            steps {
+                sh 'pytest test_app.py'
+            }
+        }
+        stage('Deploy') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch pattern: "release/.*", comprator: "REGEXP"
+                }
+            }
+            steps {
+                echo "Simulating deploy from branch ${env.BRANCH_NAME}"
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                def payload = [
+                    content: "✅ Build SUCCESS on '${env.BRANCH_NAME}'\nURL: ${env.BUILD_URL}"
+                ]
+                httpRequest(
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: groovy.json.JsonOutput.toJson(payload),
+                    url: 'https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
+                )
+            }
+        }
+        failure {
+            script {
+                def payload = [
+                    content: "❌ Build FAILED on '${env.BRANCH_NAME}'\nURL: ${env.BUILD_URL}"
+                ]
+                httpRequest(
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: groovy.json.JsonOutput.toJson(payload),
+                    url: 'https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
+                )
+            }
+        }
+    }
+}
