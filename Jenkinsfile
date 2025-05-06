@@ -4,23 +4,32 @@ pipeline {
             image 'python:3.10'
         }
     }
+
+    environment {
+        VENV = 'venv'
+    }
     
     stages {
-        stage('Install Curl') {
+        stage('Setup Environment & Install Dependencies') {
             steps {
-                sh 'apt-get update && apt-get install -y curl'
+                sh '''
+                    python -m venv $VENV
+                    . $VENV/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
             }
         }
-        stage('Install Depencies') {
+
+        stage('Run Tests') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh '''
+                    . $VENV/bin/activate
+                    pytest test_app.py
+                '''
             }
         }
-        stage('Run Test') {
-            steps {
-                sh 'pytest test_app.py'
-            }
-        }
+        
         stage('Deploy') {
             when {
                 anyOf {
