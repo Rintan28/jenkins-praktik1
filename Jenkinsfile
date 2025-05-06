@@ -29,32 +29,23 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            script {
-                def payload = [
-                    content: "✅ Build SUCCESS on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
-                ]
-                httpRequest(
-                    httpMode: 'POST',
-                    contentType: 'APPLICATION_JSON',
-                    requestBody: groovy.json.JsonOutput.toJson(payload),
-                    url: 'https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
-                )
-            }
-        }
-        failure {
-            script {
-                def payload = [
-                    content: "❌ Build FAILED on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
-                ]
-                httpRequest(
-                    httpMode: 'POST',
-                    contentType: 'APPLICATION_JSON',
-                    requestBody: groovy.json.JsonOutput.toJson(payload),
-                    url: 'https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
-                )
-            }
-        }
+post {
+    success {
+        sh """
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d '{"content":"✅ Build SUCCESS on branch ${env.BRANCH_NAME}"}' \
+             https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
+        """
     }
+    failure {
+        sh """
+        curl -H "Content-Type: application/json" \
+             -X POST \
+             -d '{"content":"❌ Build FAILED on branch ${env.BRANCH_NAME}"}' \
+             https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
+        """
+    }
+}
+
 }
