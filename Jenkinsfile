@@ -25,7 +25,7 @@ pipeline {
             when {
                 anyOf {
                     branch 'main'
-                    branch pattern: "release/.*", comprator: "REGEXP"
+                    branch pattern: "release/.*", comparator: "REGEXP"
                 }
             }
             steps {
