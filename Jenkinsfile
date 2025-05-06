@@ -4,8 +4,13 @@ pipeline {
             image 'python:3.10'
         }
     }
-
+    
     stages {
+        stage('Install Curl') {
+            steps {
+                sh 'apt-get update && apt-get install -y curl'
+            }
+        }
         stage('Install Depencies') {
             steps {
                 sh 'pip install -r requirements.txt'
