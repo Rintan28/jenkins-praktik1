@@ -36,23 +36,29 @@ pipeline {
 
     post {
         success {
-            node {
-                sh """
-                curl -H "Content-Type: application/json" \
-                     -X POST \
-                     -d '{"content":"✅ Build SUCCESS on branch ${env.BRANCH_NAME}"}' \
-                     https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
-                """
+            script {
+                def payload = [
+                    content: "✅ Build SUCCESS on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
+                ]
+                httpRequest(
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: groovy.json.JsonOutput.toJson(payload),
+                    url: 'https://discord.com/api/webhooks/1368300558699466824/da5JH5oV5gFL3vC1kQTSvTHZ0J5-tIkDiHQR1eWKe66128KBl4Vw2khxqxnHUkMqAQC-'
+                )
             }
         }
         failure {
-            node {
-                sh """
-                curl -H "Content-Type: application/json" \
-                     -X POST \
-                     -d '{"content":"❌ Build FAILED on branch ${env.BRANCH_NAME}"}' \
-                     https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ
-                """
+            script {
+                def payload = [
+                    content: "❌ Build FAILED on `${env.BRANCH_NAME}`\nURL: ${env.BUILD_URL}"
+                ]
+                httpRequest(
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: groovy.json.JsonOutput.toJson(payload),
+                    url: 'https://discord.com/api/webhooks/136830055869946
+                )
             }
         }
     }
