@@ -34,23 +34,22 @@ pipeline {
         }
     }
 
-post {
-    success {
-        sh """
-        curl -H "Content-Type: application/json" \
-             -X POST \
-             -d '{"content":"✅ Build SUCCESS on branch ${env.BRANCH_NAME}"}' \
-             https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
-        """
+    post {
+        success {
+            sh """
+            curl -H "Content-Type: application/json" \
+                 -X POST \
+                 -d '{"content":"✅ Build SUCCESS on branch ${env.BRANCH_NAME}"}' \
+                 https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
+            """
+        }
+        failure {
+            sh """
+            curl -H "Content-Type: application/json" \
+                 -X POST \
+                 -d '{"content":"❌ Build FAILED on branch ${env.BRANCH_NAME}"}' \
+                 https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ
+            """
+        }
     }
-    failure {
-        sh """
-        curl -H "Content-Type: application/json" \
-             -X POST \
-             -d '{"content":"❌ Build FAILED on branch ${env.BRANCH_NAME}"}' \
-             https://discord.com/api/webhooks/1369197474174074961/d92R5Wvj2_7NOsFNajK-GOmTdZMRDwIlYpNmBHiKZq2YHoD3HUipDuo4uo19nddjGFJZ'
-        """
-    }
-}
-
 }
